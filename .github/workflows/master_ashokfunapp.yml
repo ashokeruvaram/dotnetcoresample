@@ -10,8 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: '6.0.x' # set this to the dotnet version to use
+  DOTNET_VERSION: '6.x' # set this to the dotnet version to use
 
 jobs:
   build-and-deploy:
@@ -24,19 +23,21 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          
+      - name: Install dependencies
+        run: dotnet restore ./dotnetcoresample/sampledotnetapp/sampledotnetapp/sampledotnetapp.csproj
 
-      - name: 'Resolve Project Dependencies Using Dotnet'
-        shell: pwsh
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output ./output
-          popd
+      - name: Resolve Project Dependencies Using Dotnet
+        run: dotnet build dotnetcoresample/sampledotnetapp/sampledotnetapp/sampledotnetapp.csproj --configuration Release --output ./output
+          
 
-      - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1
-        id: fa
-        with:
-          app-name: 'ashokfunapp'
-          slot-name: 'Production'
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D0FDB560F6D44A6DB98B3D26B400CE62 }}
+      #- name: 'Run Azure Functions Action'
+      # uses: Azure/functions-action@v1
+       # id: fa
+        #with:
+         # app-name: 'ashokfunapp'
+          #slot-name: 'Production'
+          #package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          #publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D0FDB560F6D44A6DB98B3D26B400CE62 }}
+          
+
